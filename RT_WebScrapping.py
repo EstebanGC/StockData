@@ -1,43 +1,20 @@
 import requests
 from bs4 import BeautifulSoup
 
-def get_real_time_price(stock_code):
-    """
-    Fetches real-time price and change for a given stock code from investing.com.
+url = 'https://www.bloomberg.com/markets/currencies/americas'
 
-    Args:
-        stock_code (str): The stock code (e.g., 'BTC/USD').
+response = requests.get(url)
 
-    Returns:
-        tuple: A tuple containing the price (str) and change (str),
-               or an empty tuple if data is unavailable.
-    """
+if response.status_code == 200:
+    print("Succesful request!")
+else:
+        print("Error getting page:", response.status_code)
+        exit()
 
-    url = f'https://www.investing.com/crypto/{stock_code}'
+soup = BeautifulSoup(response.content, 'html.parser')
 
-    try:
-        response = requests.get(url, headers={'User-Agent': 'your_user_agent'})  # Add user-agent to respect website policies
-        response.raise_for_status()  # Raise exception for non-200 status codes
-        soup = BeautifulSoup(response.content, 'lxml')
+element_price = soup.find("span", class_='data-table-row-cell')
 
-        price_element = soup.find('span', class_='price-change')
-        if price_element:
-            price = price_element.find('span', class_='thin').text.strip()
-            change_element = price_element.find_next_sibling('span')
-            change = change_element.text.strip() if change_element else ''
-            return price, change
-        else:
-            return '', ''  # Return empty values if price element not found
-    except requests.exceptions.RequestException as e:  # Handle all request exceptions
-        print(f"Error fetching data: {e}")
-        return '', ''
+bitcoin_price = element_price.text.strip()
 
-if __name__ == '__main__':
-    stock_code = 'bitcoin'
-    price, change = get_real_time_price(stock_code)
-
-    if price:
-        print(f"Real-time price for {stock_code}: {price}")
-        print(f"Change: {change}")
-    else:
-        print(f"Unable to retrieve real-time price for {stock_code}.")
+print("Bitcoin price:", bitcoin_price)
