@@ -18,3 +18,4 @@ element_price = soup.find("span", class_='data-table-row-cell')
 bitcoin_price = element_price.text.strip()
 
 print("Bitcoin price:", bitcoin_price)
+print("Whatever")
